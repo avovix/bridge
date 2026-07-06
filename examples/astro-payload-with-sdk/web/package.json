@@ -1,0 +1,25 @@
+{
+  "name": "astro-payload-with-sdk-web",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@avovix/astro-loader-payload": "workspace:*",
+    "@payloadcms/sdk": "^3.85.2",
+    "@tailwindcss/vite": "^4.3.2",
+    "astro": "^7.0.6",
+    "astro-payload-with-sdk-cms": "workspace:*",
+    "payload": "^3.85.2",
+    "tailwindcss": "^4.3.2"
+  },
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a"
+}

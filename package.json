@@ -1,0 +1,14 @@
+{
+  "name": "avovix-bridge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
+  "packageManager": "pnpm@10.24.0"
+}

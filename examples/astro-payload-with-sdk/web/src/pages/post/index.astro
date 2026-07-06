@@ -1,0 +1,28 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+const posts = await getCollection('posts')
+---
+
+<Layout title="Posts">
+	<h1 class="text-3xl font-bold tracking-tight">Posts</h1>
+	<p class="mt-2 text-gray-600">{posts.length} post{posts.length === 1 ? '' : 's'} from Payload.</p>
+
+	<ul class="mt-8 space-y-4">
+		{
+			posts.map((post) => (
+				<li class="rounded-lg border border-gray-200 bg-white p-5 transition hover:border-gray-300">
+					<a href={`/post/${post.data.slug}/`} class="block">
+						<h2 class="text-lg font-semibold hover:text-blue-600">
+							{post.data.title}
+						</h2>
+						{post.data.excerpt && (
+							<p class="mt-1 line-clamp-2 text-sm text-gray-600">{post.data.excerpt}</p>
+						)}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</Layout>

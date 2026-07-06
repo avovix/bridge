@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+const posts = await getCollection('posts')
+---
+
+<Layout title="Astro + Payload (SDK)">
+	<h1 class="text-3xl font-bold tracking-tight">Astro + Payload (SDK)</h1>
+
+	<p class="mt-4 text-gray-600">
+		This example loads content from Payload into Astro's content layer using the
+		SDK adapter. The posts below come from
+		<code class="rounded bg-gray-100 px-1.5 py-0.5 text-sm">getCollection('posts')</code>.
+	</p>
+
+	<div class="mt-8 rounded-lg border border-gray-200 bg-white p-6">
+		<p class="text-sm text-gray-500">Loaded from Payload</p>
+		<p class="mt-1 text-2xl font-semibold">{posts.length} post{posts.length === 1 ? '' : 's'}</p>
+		<a
+			href="/post/"
+			class="mt-4 inline-block text-sm font-medium text-blue-600 hover:underline"
+		>
+			View all posts &rarr;
+		</a>
+	</div>
+</Layout>

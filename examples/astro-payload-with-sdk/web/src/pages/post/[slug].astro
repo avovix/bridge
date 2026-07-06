@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { getCollection, type CollectionEntry } from 'astro:content'
+
+export async function getStaticPaths() {
+	const posts = await getCollection('posts')
+
+	return posts.map((post) => ({
+		params: { slug: post.data.slug },
+		props: { post },
+	}))
+}
+
+type Props = { post: CollectionEntry<'posts'> }
+
+const { post } = Astro.props
+---
+
+<Layout title={post.data.title}>
+	<a href="/post/" class="text-sm text-blue-600 hover:underline">&larr; Back to posts</a>
+
+	<article class="mt-4">
+		<h1 class="text-3xl font-bold tracking-tight">{post.data.title}</h1>
+
+		{
+			post.data.excerpt && (
+				<p class="mt-4 text-lg text-gray-600">{post.data.excerpt}</p>
+			)
+		}
+	</article>
+</Layout>

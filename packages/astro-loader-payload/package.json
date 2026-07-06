@@ -1,0 +1,53 @@
+{
+  "name": "@avovix/astro-loader-payload",
+  "version": "0.1.0",
+  "description": "Astro content layer loader for Payload CMS — build-time and live collections, fully typed.",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "withastro",
+    "astro-loader",
+    "payload",
+    "payloadcms",
+    "cms",
+    "content-layer",
+    "loader"
+  ],
+  "author": {
+    "name": "Stephen Covell",
+    "email": "stephen@sledgehammer.dev",
+    "url": "https://avovix.com"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "packageManager": "pnpm@10.24.0",
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "@payloadcms/sdk": "^3",
+    "astro": "^7",
+    "payload": "^3"
+  },
+  "peerDependencies": {
+    "@payloadcms/sdk": "^3",
+    "astro": "^7",
+    "payload": "^3"
+  },
+  "peerDependenciesMeta": {
+    "@payloadcms/sdk": {
+      "optional": true
+    }
+  }
+}
