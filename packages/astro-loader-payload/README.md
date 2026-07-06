@@ -4,7 +4,7 @@ An [Astro content layer](https://docs.astro.build/en/guides/content-collections/
 
 Load your Payload collections into Astro's content layer and query them with `getCollection` and `getEntry`, just like any other Astro collection.
 
-> **Alpha.** This is a new package (`0.1.x`). The API may change before `1.0`. Feedback and issues welcome.
+> **Alpha.** This is a new package. The API may change before `1.0`. Feedback and issues welcome.
 
 ## Status & feedback
 
