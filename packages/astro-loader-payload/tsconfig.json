@@ -1,8 +1,18 @@
 {
   "extends": "../../tsconfig.base.json",
+  // "incremental": true,
+  // "tsBuildInfoFile": ".tsbuildinfo",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    // Empty files / studs to exclude from compiling
+    "src/adapters/payload-graphql.ts",
+    "src/adapters/payload-local.ts",
+    "src/adapters/payload-mock.ts",
+    "src/loaders/internal.ts",
+    "src/types/types.ts"
+  ]
 }

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Astro content layer loader for Payload CMS — build-time and live collections, fully typed.",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
@@ -24,15 +24,26 @@
   },
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "files": [
     "dist",
-    "LICENSE"
+    "LICENSE",
+    "README.md"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avovix/bridge.git",
+    "directory": "packages/astro-loader-payload"
+  },
+  "homepage": "https://github.com/avovix/bridge/tree/main/packages/astro-loader-payload#readme",
+  "bugs": "https://github.com/avovix/bridge/issues",
   "packageManager": "pnpm@10.24.0",
   "devDependencies": {
     "typescript": "^6.0.3",
