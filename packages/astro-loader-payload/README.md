@@ -16,7 +16,7 @@ so if something is missing, unclear, or doesn't fit your use case, please
 
 ## Why this loader
 
-- **Fully typed:** `collectionSlug`, `idField`, and query options are typed against your own Payload `Config`, so you get autocomplete and type-checking for your collections and fields directly in `content.config.ts` and `live.config.ts`.
+- **Fully typed:** `collection`, `idField`, and query options are typed against your own Payload `Config`, so you get autocomplete and type-checking for your collections and fields directly in `content.config.ts` and `live.config.ts`.
 - **Uses your own Payload client:** you pass in the SDK client you already configured, so it always matches your Payload version and you keep the full range of client options (auth, base URL, custom fetch, and more) without waiting on this package to expose them. The SDK client is supported now, with Local API and GraphQL planned.
 - **Build-time and live:** covers static content collections and live (on-demand) collections.
 - **Full query passthrough:** anything Payload's find supports (`where`, `sort`, `depth`, `locale`, `draft`, and more) is passed straight through, not limited to a fixed set of options.
@@ -51,7 +51,7 @@ const sdk = new PayloadSDK<Config>({
 const posts = defineCollection({
   loader: payloadCollectionLoader({
     adapter: payloadSdkAdapter(sdk),
-    collectionSlug: 'posts',
+    collection: 'posts',
   }),
 })
 
@@ -87,7 +87,7 @@ import { payloadCollectionLoader, payloadSdkAdapter } from '@avovix/astro-loader
 const posts = defineCollection({
   loader: payloadCollectionLoader({
     adapter: payloadSdkAdapter(sdk),
-    collectionSlug: 'posts',
+    collection: 'posts',
   }),
   schema: z.object({
     title: z.string(),
@@ -106,7 +106,7 @@ validation, pass `skipValidation: true` in the loader options instead.
 ```ts
 payloadCollectionLoader({
   adapter,             // required. A Payload adapter (see below).
-  collectionSlug,      // required. The collection to load, e.g. 'posts'.
+  collection,      // required. The collection to load, e.g. 'posts'.
 
   skipValidation,      // optional. Skip Astro schema validation of each entry.
   loaderName,          // optional. Log name (defaults to the slug; null to disable).
@@ -122,7 +122,7 @@ By default entries are keyed by the Payload document `id`. Set `idField` to key 
 ```ts
 payloadCollectionLoader({
   adapter: payloadSdkAdapter(sdk),
-  collectionSlug: 'posts',
+  collection: 'posts',
   idField: 'slug', // now getEntry('posts', 'my-slug') works
 })
 ```
@@ -136,7 +136,7 @@ Anything you can pass to a Payload find is passed straight through:
 ```ts
 payloadCollectionLoader({
   adapter: payloadSdkAdapter(sdk),
-  collectionSlug: 'posts',
+  collection: 'posts',
   query: {
     where: { _status: { equals: 'published' } },
     sort: '-createdAt',
@@ -162,7 +162,7 @@ const sdk = new PayloadSDK<Config>({ baseURL: import.meta.env.PAYLOAD_BASE_URL }
 const posts = defineLiveCollection({
   loader: payloadLiveCollectionLoader({
     adapter: payloadSdkAdapter(sdk),
-    collectionSlug: 'posts',
+    collection: 'posts',
   }),
 })
 

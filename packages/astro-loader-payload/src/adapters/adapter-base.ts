@@ -8,18 +8,7 @@ import type {
 } from "payload"
 
 
-// export interface PayloadBaseAdapter<TSlug extends CollectionSlug = CollectionSlug> {
 export interface PayloadBaseAdapter<T extends PayloadTypesShape> {
-    // find(args: {
-    //     collection: CollectionSlug<T>
-    //     sort?: string
-    //     limit?: number
-    //     page?: number
-    //     depth?: number
-    //     where?: Where
-    // }): Promise<{
-    //     docs: Record<string, unknown>[]
-    // }
 
     find(
         args: FindOptions<CollectionSlug<T>, never>

@@ -6,8 +6,7 @@ export interface payloadBaseOptions<
   TSlug extends CollectionSlug<T>
   > {
     adapter: PayloadBaseAdapter<T>
-    // collectionSlug: CollectionSlug<T>
-    collectionSlug: TSlug,
+    collection: TSlug,
 
     // Optional options
     skipValidation?: boolean
@@ -26,8 +25,10 @@ export interface payloadBaseOptions<
     // retries?: number  // opt in retry count for transient failures
     // transform?: (doc) => Record<string, unknown> // let users reshape docs before store.set (e.g. flatten, rename, resolve URLs)
     // rendered?: (doc) => { html: string } // provide rendered HTML (e.g. from richText) so pages can use render(entry)
+    // global collections?
     // 
 }
 
 export type QueryOmitCollection<T extends PayloadTypesShape> =
   Omit<Parameters<PayloadBaseAdapter<T>['find']>[0], 'collection'>
+  

@@ -4,6 +4,9 @@ import type {
     QueryOmitCollection
 } from "../types";
 import type { Loader } from "astro/loaders";
+import {
+    resolveLoaderName
+} from '../internal/resolve-name'
 
 interface payloadOptions<
     T extends PayloadTypesShape,
@@ -19,11 +22,7 @@ export function payloadCollectionLoader<
     TSlug extends CollectionSlug<T>>(
     options: payloadOptions<T, TSlug>
 ) {
-    
-    const name =
-        options.loaderName === null
-            ? 'payload-loader'
-            : options.loaderName ?? `payload-loader:${options.collectionSlug}`
+    const name = resolveLoaderName(options.collection, options.loaderName);
 
     return {
         name: name,
@@ -37,12 +36,10 @@ export function payloadCollectionLoader<
 
                 // Overrides
                 ...options.query,
-                collection: options.collectionSlug, 
+                collection: options.collection, 
             }) ;
 
-
             store.clear();
-
 
             for (const item of collection.docs) {
                 const raw = item as unknown as Record<string, unknown>

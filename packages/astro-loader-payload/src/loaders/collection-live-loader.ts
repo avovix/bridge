@@ -1,6 +1,7 @@
 import type { CollectionSlug, PayloadTypesShape } from "payload";
 import type { payloadBaseOptions, QueryOmitCollection } from "../types";
 import type { LiveLoader } from "astro/loaders";
+import { resolveLoaderName } from "../internal/resolve-name";
 
 // Use an alias for now until live needs separate fields
 type payloadLiveOptions<
@@ -18,10 +19,7 @@ export function payloadLiveCollectionLoader<
     options: payloadLiveOptions<T, TSlug>
 ): LiveLoader<Record<string, unknown>, EntryFilter, QueryOmitCollection<T>>  {
 
-    const name =
-        options.loaderName === null
-            ? 'payload-loader'
-            : options.loaderName ?? `payload-loader:${options.collectionSlug}`
+    const name = resolveLoaderName(options.collection, options.loaderName);
 
     return {
         name: name,
@@ -33,7 +31,7 @@ export function payloadLiveCollectionLoader<
                 limit: 1000,
 
                 ...filter,
-                collection: options.collectionSlug, 
+                collection: options.collection, 
             });
 
             const idKey = options.idField ?? 'id'
@@ -55,7 +53,7 @@ export function payloadLiveCollectionLoader<
 
             const entry = await options.adapter.findByID({
                 ...filter,
-                collection: options.collectionSlug,
+                collection: options.collection,
             })
 
             return entry ? { id: entry.id.toString(), data: entry as unknown as Record<string, unknown> } : undefined
