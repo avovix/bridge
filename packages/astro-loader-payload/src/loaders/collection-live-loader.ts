@@ -11,13 +11,16 @@ type payloadLiveOptions<
 
 type EntryFilter = { id: string | number}
 
+// Alias + allows us to adjust easily in the future + Readability
+type PayloadFindQuery<T extends PayloadTypesShape> = QueryOmitCollection<T>;
+
 // Live Loader uses 'filter' instead of 'query'
 export function payloadLiveCollectionLoader<
     T extends PayloadTypesShape,
     TSlug extends CollectionSlug<T>
 >(
     options: payloadLiveOptions<T, TSlug>
-): LiveLoader<Record<string, unknown>, EntryFilter, QueryOmitCollection<T>>  {
+): LiveLoader<Record<string, unknown>, EntryFilter, PayloadFindQuery<T>>  {
 
     const name = resolveLoaderName(options.collection, options.loaderName);
 
@@ -45,19 +48,28 @@ export function payloadLiveCollectionLoader<
                 })
             }
         },
+        
         loadEntry: async ({filter}) => {
             // Let the user define their own idField to use
-            // const idKey = options.idField ?? 'id'
-            // const rawId = raw[idKey] ?? item.id
-            // const id = String(rawId)
+            const idKey = options.idField ?? 'id'
 
-            const entry = await options.adapter.findByID({
-                ...filter,
+            const result = await options.adapter.find({
+                // ...filter,
                 collection: options.collection,
+
+                where: {
+                    [idKey]: {equals: filter.id}
+                },
+                limit: 2 // If there are more than 2 docs found, throw an error
             })
 
-            return entry ? { id: entry.id.toString(), data: entry as unknown as Record<string, unknown> } : undefined
+            const doc = result.docs[0]
+            if (!doc) return undefined
+
+            const raw = doc as unknown as Record<string, unknown>
+            return { id: String(raw[idKey]), data: raw}
+            // return entry ? { id: entry.id.toString(), data: entry as unknown as Record<string, unknown> } : undefined
         },
 
-    } satisfies LiveLoader<Record<string, unknown>, EntryFilter, QueryOmitCollection<T>>
+    } satisfies LiveLoader<Record<string, unknown>, EntryFilter, PayloadFindQuery<T>>
 }

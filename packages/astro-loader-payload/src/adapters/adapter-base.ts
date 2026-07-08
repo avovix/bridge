@@ -14,11 +14,11 @@ export interface PayloadBaseAdapter<T extends PayloadTypesShape> {
         args: FindOptions<CollectionSlug<T>, never>
     ): Promise<PaginatedDocs<TypeWithID>>
 
-    findByID(args: {
-        collection: CollectionSlug<T>
-        id: string | number
-        depth?: number
-    }): Promise<TypeWithID | null>
+    // findByID(args: {
+    //     collection: CollectionSlug<T>
+    //     id: string | number
+    //     depth?: number
+    // }): Promise<TypeWithID | null>
 
     // todo: open payloadcms to export findByID - possibility an oversight?
     // lines 72-80 don't re-export the types

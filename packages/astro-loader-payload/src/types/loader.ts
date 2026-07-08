@@ -13,8 +13,7 @@ export interface payloadBaseOptions<
     loaderName?: string | null // defaults to collectionSlug, use null to disable and use string to customize/override
     idField?: keyof DataFromCollectionSlug<TSlug> // useful for getEntry('posts', slug)
 
-    // idField?: Field | null
-    // idField?: keyof DataFromCollectionSlug<CollectionSlug<T>>
+    // Ideas / options to implement in the future
     // fetchAll?: boolean // same as traversal?
     // pageSize?: number // // per-page size when traversing
     // paginationTraversal?: boolean
@@ -29,6 +28,9 @@ export interface payloadBaseOptions<
     // 
 }
 
+// Often used when query field is exposed. Base options exposes collection field.
+// As its hoisted up, we don't want to provide two options for collection field.
+// Belt and suspenders..?
 export type QueryOmitCollection<T extends PayloadTypesShape> =
   Omit<Parameters<PayloadBaseAdapter<T>['find']>[0], 'collection'>
   

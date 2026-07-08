@@ -19,7 +19,9 @@ describe("payloadLiveCollectionLoader", () => {
 
             if ('error' in result) throw result.error
             expect(result.entries).toHaveLength(1)
-            expect(result.entries[0].id).toBe('1')
+
+            const [entry] = result.entries
+            expect(entry?.id).toBe('1')
         })
 
         it('keys entries by idField when provided', async() => {
@@ -51,15 +53,25 @@ describe("payloadLiveCollectionLoader", () => {
             const result = await loader.loadCollection({ filter: {}, collection: 'posts' })
 
             if ('error' in result) throw result.error
-            expect(result.entries[0].id).toBe('42')   // fell back to id
+
+            const [entry] = result.entries
+            expect(entry?.id).toBe('42')
         })
 
     })
 
     describe('loadEntry', () => {
         it('returns a single entry by id', async () => {
+            // const adapter = payloadMockAdapter({
+            //     find: async () => ({ id: 1, slug: 'hello' }),
+            // })
+
             const adapter = payloadMockAdapter({
-            findByID: async () => ({ id: 1, slug: 'hello' }),
+                find: async () => ({
+                    docs: [{ id: 1, slug: 'hello' }],
+                    totalDocs: 1, limit: 1, totalPages: 1, page: 1, pagingCounter: 1,
+                    hasPrevPage: false, hasNextPage: false, prevPage: null, nextPage: null,
+                }),
             })
 
             const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts' })
@@ -71,8 +83,16 @@ describe("payloadLiveCollectionLoader", () => {
         })
 
         it('returns undefined when the entry is not found', async () => {
+            // const adapter = payloadMockAdapter({
+            //     find: async () => null,
+            // })
+
             const adapter = payloadMockAdapter({
-            findByID: async () => null,
+                find: async () => ({
+                    docs: [ ],
+                    totalDocs: 1, limit: 1, totalPages: 1, page: 1, pagingCounter: 1,
+                    hasPrevPage: false, hasNextPage: false, prevPage: null, nextPage: null,
+                }),
             })
 
             const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts' })

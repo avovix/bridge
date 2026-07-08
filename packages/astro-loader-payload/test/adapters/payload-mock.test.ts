@@ -29,24 +29,25 @@ describe('payloadMockAdapter', () => {
     })
   })
 
-  describe('findByID', () => {
-    it('uses impl.findByID when provided', async () => {
-      const doc = { id: 1, slug: 'hello' }
-      const adapter = payloadMockAdapter({
-        findByID: async () => doc,
-      })
+  // removed findByID
+  // describe('findByID', () => {
+  //   it('uses impl.findByID when provided', async () => {
+  //     const doc = { id: 1, slug: 'hello' }
+  //     const adapter = payloadMockAdapter({
+  //       findByID: async () => doc,
+  //     })
 
-      const result = await adapter.findByID({ collection: 'posts', id: 1 } as any)
+  //     const result = await adapter.findByID({ collection: 'posts', id: 1 } as any)
 
-      expect(result).toBe(doc)
-    })
+  //     expect(result).toBe(doc)
+  //   })
 
-    it('falls back to null when impl.findByID is omitted', async () => {
-      const adapter = payloadMockAdapter({})
+  //   it('falls back to null when impl.findByID is omitted', async () => {
+  //     const adapter = payloadMockAdapter({})
 
-      const result = await adapter.findByID({ collection: 'posts', id: 999 } as any)
+  //     const result = await adapter.findByID({ collection: 'posts', id: 999 } as any)
 
-      expect(result).toBeNull()
-    })
-  })
+  //     expect(result).toBeNull()
+  //   })
+  // })
 })

@@ -10,14 +10,14 @@ export function payloadSdkAdapter<T extends PayloadTypesShape>(
             return sdk.find(args as Parameters<typeof sdk.find>[0]) as Promise<PaginatedDocs<TypeWithID>>
         },
 
-        findByID: async (args) => {
-            const doc = await sdk.findByID({
-                collection: args.collection,
-                id: args.id,
-                depth: args.depth,
-                disableErrors: true,
-            } as Parameters<typeof sdk.findByID>[0])
-            return (doc ?? null) as TypeWithID | null
-        }
+        // findByID: async (args) => {
+        //     const doc = await sdk.findByID({
+        //         collection: args.collection,
+        //         id: args.id,
+        //         depth: args.depth,
+        //         disableErrors: true,
+        //     } as Parameters<typeof sdk.findByID>[0])
+        //     return (doc ?? null) as TypeWithID | null
+        // }
     }
 }

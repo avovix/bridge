@@ -20,6 +20,6 @@ export function payloadMockAdapter<T extends PayloadTypesShape>(
 ): PayloadBaseAdapter<T> {
   return {
     find: impl.find ?? (async () => defaultPaginatedDocs),
-    findByID: impl.findByID ?? (async () => null),
+    // findByID: impl.findByID ?? (async () => null),
   }
 }
