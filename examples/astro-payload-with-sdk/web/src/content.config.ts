@@ -11,11 +11,10 @@ const sdk = new PayloadSDK<Config>({
     baseURL: baseURL,
 })
 
-
 const posts = defineCollection({
     loader: payloadCollectionLoader({
         adapter: payloadSdkAdapter(sdk),
-        collectionSlug: 'posts', 
+        collection: 'posts', 
         skipValidation: true
     })
 })
