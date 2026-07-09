@@ -1,5 +1,5 @@
 import { LiveCollectionError } from "astro/content/runtime";
-import { AstroError } from "astro/errors";
+import { AstroError } from "astro/errors"; // astro/errors publicly aliases AstroUserError as AstroError.
 import type { PayloadErrorDefinition } from "../types";
 import { PayloadErrors } from "../data/errors-data";
 
