@@ -26,6 +26,12 @@ export interface payloadBaseOptions<
     // rendered?: (doc) => { html: string } // provide rendered HTML (e.g. from richText) so pages can use render(entry)
     // global collections?
     // 
+    // digest?: (keyof DataFromCollectionSlug<TSlug>)[] | ((doc) => string)
+    // sync?: {
+    // incremental?: boolean
+    // digest?: string | ((doc) => string)   // default 'updatedAt'
+    // deletionStrategy?: 'full' | 'trash' | 'reconcile' | 'none'
+  //}
 }
 
 // Often used when query field is exposed. Base options exposes collection field.

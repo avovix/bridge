@@ -1,5 +1,6 @@
 // Export Adapters
 export { payloadSdkAdapter } from './adapters/payload-sdk'
+export { payloadLocalAdapter } from './adapters/payload-local'
 
 // Export Loaders
 export { payloadCollectionLoader } from './loaders/collection-loader'
