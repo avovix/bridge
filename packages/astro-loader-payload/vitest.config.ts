@@ -10,6 +10,7 @@ export default getViteConfig({
       include: ['src/**/*.ts'],
       exclude: [
         'src/index.ts',
+        'src/adapters/adapter-base.ts',
         'src/adapters/payload-sdk.ts',
         'src/adapters/payload-local.ts',
         'src/adapters/payload-graphql.ts',

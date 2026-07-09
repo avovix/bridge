@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { payloadMockAdapter } from "../../src/adapters/payload-mock";
 import { payloadLiveCollectionLoader } from "../../src";
+import { PayloadLiveError } from "../../src/internal/error-utils";
 
 describe("payloadLiveCollectionLoader", () => {
     describe("loadCollection", () => {
@@ -62,9 +63,6 @@ describe("payloadLiveCollectionLoader", () => {
 
     describe('loadEntry', () => {
         it('returns a single entry by id', async () => {
-            // const adapter = payloadMockAdapter({
-            //     find: async () => ({ id: 1, slug: 'hello' }),
-            // })
 
             const adapter = payloadMockAdapter({
                 find: async () => ({
@@ -83,9 +81,6 @@ describe("payloadLiveCollectionLoader", () => {
         })
 
         it('returns undefined when the entry is not found', async () => {
-            // const adapter = payloadMockAdapter({
-            //     find: async () => null,
-            // })
 
             const adapter = payloadMockAdapter({
                 find: async () => ({
@@ -100,7 +95,60 @@ describe("payloadLiveCollectionLoader", () => {
 
             expect(result).toBeUndefined()
         })
+
+        it('returns nonUniqueIdField error when >1 docs match', async () => {
+            const adapter = payloadMockAdapter({
+                find: async () => ({
+                    docs: [{ id: 1, slug: 'dup' }, { id: 2, slug: 'dup' }],
+                    totalDocs: 1, limit: 1, totalPages: 1, page: 1, pagingCounter: 1,
+                    hasPrevPage: false, hasNextPage: false, prevPage: null, nextPage: null,
+                }),
+            })
+            const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts', idField: 'slug' })
+
+            const result = await loader.loadEntry({ filter: { id: 'dup' }, collection: 'posts' })
+
+            if (!result || !('error' in result)) {
+                throw new Error('expected an error result')
+            }
+
+            expect('error' in result && PayloadLiveError.is(result.error)).toBe(true)
+            expect((result as any).error.code).toBe('PAYLOAD_NON_UNIQUE_ID_FIELD')
+        })
+
+        it('returns entryFetchFailed error when the adapter throws', async () => {
+            const adapter = payloadMockAdapter({
+                find: async () => { throw new Error('network down') },
+            })
+            const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts' })
+
+            const result = await loader.loadEntry({ filter: { id: '1' }, collection: 'posts' })
+
+            if (!result || !('error' in result)) {
+                throw new Error('expected an error result')
+            }
+
+            expect('error' in result && PayloadLiveError.is(result.error)).toBe(true)
+            expect((result as any).error.code).toBe('PAYLOAD_ENTRY_FETCH_FAILED')
+        })
+
+        it('handles non-Error throws from the adapter', async () => {
+            const adapter = payloadMockAdapter({
+                find: async () => { throw 'a string, not an Error' }, 
+            })
+            const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts' })
+
+            const result = await loader.loadEntry({ filter: { id: '1' }, collection: 'posts' })
+
+            if (!result || !('error' in result)) throw new Error('expected error')
+            if (!PayloadLiveError.is(result.error)) throw new Error('expected PayloadLiveError')
+
+            expect(PayloadLiveError.is(result.error)).toBe(true)
+            expect(result.error.code).toBe('PAYLOAD_ENTRY_FETCH_FAILED')
+            // cause should be undefined because the thrown value wasn't an Error
+            expect((result.error as any).cause).toBeUndefined()
+        })
+
     })
 
-    
 })

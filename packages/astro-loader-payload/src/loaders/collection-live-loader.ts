@@ -2,6 +2,8 @@ import type { CollectionSlug, PayloadTypesShape } from "payload";
 import type { payloadBaseOptions, QueryOmitCollection } from "../types";
 import type { LiveLoader } from "astro/loaders";
 import { resolveLoaderName } from "../internal/resolve-name";
+import { PayloadLiveError } from "../internal/error-utils";
+import { PayloadErrors } from "../data/errors-data";
 
 // Use an alias for now until live needs separate fields
 type payloadLiveOptions<
@@ -48,27 +50,48 @@ export function payloadLiveCollectionLoader<
                 })
             }
         },
-        
+
         loadEntry: async ({filter}) => {
             // Let the user define their own idField to use
             const idKey = options.idField ?? 'id'
 
-            const result = await options.adapter.find({
-                // ...filter,
-                collection: options.collection,
+            let result 
+            
+            try {
+                result = await options.adapter.find({
+                    collection: options.collection,
 
-                where: {
-                    [idKey]: {equals: filter.id}
-                },
-                limit: 2 // If there are more than 2 docs found, throw an error
-            })
+                    where: {
+                        [idKey]: {equals: filter.id}
+                    },
+                    limit: 2 // If there are more than 2 docs found, throw an error
+                })
+            } catch (cause) {
+                return {
+                    error: PayloadLiveError.from(
+                        options.collection,
+                        PayloadErrors.entryFetchFailed,
+                        [options.collection, filter.id],
+                        cause instanceof Error ? cause : undefined,
+                    )
+                }
+            }
+
+            if (result.docs.length > 1) {
+                return {
+                    error: PayloadLiveError.from(
+                        options.collection,
+                        PayloadErrors.nonUniqueIdField,
+                        [options.collection, idKey.toString()]
+                    )
+                }
+            }
 
             const doc = result.docs[0]
             if (!doc) return undefined
 
             const raw = doc as unknown as Record<string, unknown>
             return { id: String(raw[idKey]), data: raw}
-            // return entry ? { id: entry.id.toString(), data: entry as unknown as Record<string, unknown> } : undefined
         },
 
     } satisfies LiveLoader<Record<string, unknown>, EntryFilter, PayloadFindQuery<T>>
