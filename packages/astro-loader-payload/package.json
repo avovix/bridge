@@ -1,6 +1,6 @@
 {
   "name": "@avovix/astro-loader-payload",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Astro content layer loader for PayloadCMS, with build-time and live collections and full typed.",
   "scripts": {
     "build": "tsc --build",
