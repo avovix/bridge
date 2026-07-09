@@ -1,5 +1,5 @@
 import type { CollectionSlug, PayloadTypesShape } from "payload";
-import type { payloadBaseOptions, QueryOmitCollection } from "../types";
+import type { PayloadCollectionOptions, QueryOmitCollection } from "../types";
 import type { LiveLoader } from "astro/loaders";
 import { resolveLoaderName } from "../internal/resolve-name";
 import { PayloadLiveError } from "../internal/error-utils";
@@ -9,7 +9,7 @@ import { PayloadErrors } from "../data/errors-data";
 type payloadLiveOptions<
     T extends PayloadTypesShape, 
     TSlug extends CollectionSlug<T>
-> = payloadBaseOptions<T, TSlug>
+> = PayloadCollectionOptions<T, TSlug>
 
 type EntryFilter = { id: string | number}
 
@@ -42,7 +42,7 @@ export function payloadLiveCollectionLoader<
 
                     // Sensible presets
                     sort: 'createdAt',
-                    limit: 1000,
+                    pagination: false,
 
                     ...filter,
                     collection: options.collection, 

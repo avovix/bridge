@@ -1,0 +1,3 @@
+
+export const DEFAULT_ADAPTIVE_THRESHOLD = 1000
+export const DEFAULT_STREAM_PAGE_SIZE = 50

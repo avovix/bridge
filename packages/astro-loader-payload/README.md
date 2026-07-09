@@ -199,6 +199,51 @@ payloadCollectionLoader({
 })
 ```
 
+### `pagination` (build loader)
+
+Payload paginates finds with a default `limit` of 10, so a plain find returns
+only the first 10 documents. To avoid silently dropping entries, the build loader
+fetches **all** documents by default. You choose the strategy with `mode`:
+
+```ts
+payloadCollectionLoader({
+  adapter: payloadSdkAdapter(sdk),
+  collection: 'posts',
+  pagination: {
+    mode: 'default', // 'default' | 'single' | 'stream'
+  },
+})
+```
+
+- **`default`** — probes the first page to see how large the collection is, then
+  adapts: small collections are fetched in a single request, while large ones are
+  streamed page by page. A good choice for most cases.
+- **`single`** — fetches everything in one request (`pagination: false`). Best
+  when you know the collection is small and want a single round trip.
+- **`stream`** — always traverses page by page, processing each page as it
+  arrives, keeping memory flat for very large collections.
+
+You have two levers over pagination:
+
+- **`pagination.mode`** — chooses the strategy above.
+- **`query.limit`** — sets the **page size** used while streaming (how many
+  documents are fetched per request). Lower it to reduce memory per request on
+  very large collections, or raise it to make fewer requests. If unset, a sensible
+  default is used.
+
+```ts
+payloadCollectionLoader({
+  adapter: payloadSdkAdapter(sdk),
+  collection: 'posts',
+  pagination: { mode: 'stream' },
+  query: { limit: 200 }, // fetch 200 documents per request while streaming
+})
+```
+
+Anything else you put in `query` (`where`, `sort`, `depth`, and so on) is
+respected as usual; only the pagination controls (`limit`, `page`, `pagination`)
+are managed by the loader when fetching all documents.
+
 ## Live collections
 
 For always-fresh data (SSR / on-demand rendering), use the live loader with a
@@ -221,6 +266,21 @@ const posts = defineLiveCollection({
 })
 
 export const collections = { posts }
+```
+
+### Pagination in live collections
+
+The live loader returns **all** matching documents by default (it uses
+`pagination: false` under the hood). Because live collections run per request,
+you control pagination through the `filter` you pass to `getLiveCollection`,
+rather than a loader option:
+
+```ts
+// a page of results
+const { entries } = await getLiveCollection('posts', { limit: 20, page: 2 })
+
+// all results (the default, shown explicitly)
+const { entries } = await getLiveCollection('posts', { pagination: false })
 ```
 
 Unlike the build-time loader (which takes a `query` option), the live loader
@@ -324,7 +384,6 @@ export * from './payload-types'
 ## Known limitations & gotchas
 
 - **Alpha:** API may change before `1.0`.
-- **Entry limit:** the loader fetches up to 1000 entries per collection by default. Pass `query.limit` to change it. Full pagination traversal is planned.
 - **HMR in dev:** due to [an Astro limitation](https://github.com/withastro/astro/issues/13253), define your collections directly in `content.config.ts` rather than in a separate imported file, or HMR may not pick up changes.
 - **Empty on first run:** if a collection appears empty when you first start the dev server, trigger a content sync with `s` + Enter, or restart the server.
 - **GraphQL adapter planned:** SDK (REST) and Local API adapters are supported; a GraphQL adapter is planned.

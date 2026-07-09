@@ -1,6 +1,7 @@
 export type {
-    payloadBaseOptions,
-    QueryOmitCollection
+    PayloadBaseOptions,
+    QueryOmitCollection,
+    PayloadCollectionOptions
 } from './loader'
 
 export type {
