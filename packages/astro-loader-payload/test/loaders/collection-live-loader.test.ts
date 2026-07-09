@@ -59,6 +59,22 @@ describe("payloadLiveCollectionLoader", () => {
             expect(entry?.id).toBe('42')
         })
 
+        it('returns entryFailed error when the adapter throws', async () => {
+            const adapter = payloadMockAdapter({
+                find: async () => { throw new Error('network down') },
+            })
+            const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts' })
+
+            const result = await loader.loadCollection({ collection: 'posts' })
+
+            if (!result || !('error' in result)) {
+                throw new Error('expected an error result')
+            }
+
+            expect('error' in result && PayloadLiveError.is(result.error)).toBe(true)
+            expect((result as any).error.code).toBe('PAYLOAD_FETCH_FAILED')
+        })
+
     })
 
     describe('loadEntry', () => {
@@ -130,23 +146,6 @@ describe("payloadLiveCollectionLoader", () => {
 
             expect('error' in result && PayloadLiveError.is(result.error)).toBe(true)
             expect((result as any).error.code).toBe('PAYLOAD_ENTRY_FETCH_FAILED')
-        })
-
-        it('handles non-Error throws from the adapter', async () => {
-            const adapter = payloadMockAdapter({
-                find: async () => { throw 'a string, not an Error' }, 
-            })
-            const loader = payloadLiveCollectionLoader({ adapter, collection: 'posts' })
-
-            const result = await loader.loadEntry({ filter: { id: '1' }, collection: 'posts' })
-
-            if (!result || !('error' in result)) throw new Error('expected error')
-            if (!PayloadLiveError.is(result.error)) throw new Error('expected PayloadLiveError')
-
-            expect(PayloadLiveError.is(result.error)).toBe(true)
-            expect(result.error.code).toBe('PAYLOAD_ENTRY_FETCH_FAILED')
-            // cause should be undefined because the thrown value wasn't an Error
-            expect((result.error as any).cause).toBeUndefined()
         })
 
     })

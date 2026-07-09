@@ -7,6 +7,8 @@ import type { Loader } from "astro/loaders";
 import {
     resolveLoaderName
 } from '../internal/resolve-name'
+import { PayloadLoaderError } from "../internal/error-utils";
+import { PayloadErrors } from "../data/errors-data";
 
 interface payloadOptions<
     T extends PayloadTypesShape,
@@ -28,16 +30,26 @@ export function payloadCollectionLoader<
         name: name,
         load: async({ store, parseData}) => {
 
-            const collection = await options.adapter.find({
-                // Sensible presets
-                sort: 'createdAt',
-                draft: false,
-                limit: 1000,
+            let collection 
 
-                // Overrides
-                ...options.query,
-                collection: options.collection, 
-            }) ;
+            try {
+                collection = await options.adapter.find({
+                    // Sensible presets
+                    sort: 'createdAt',
+                    draft: false,
+                    limit: 1000,
+
+                    // Overrides
+                    ...options.query,
+                    collection: options.collection, 
+                });
+            } catch (cause) {
+                throw PayloadLoaderError.from(
+                    PayloadErrors.fetchFailed,
+                    [options.collection],
+                    cause
+                )
+            }
 
             store.clear();
 
@@ -54,9 +66,19 @@ export function payloadCollectionLoader<
                 //     logger.warn(`idField "${options.idField}" missing on a doc; using id instead`)
                 // }
 
-                const data = options.skipValidation
-                    ? raw
-                    : await parseData({ id, data: raw })
+                let data
+
+                try {
+                    data = options.skipValidation
+                        ? raw
+                        : await parseData({ id, data: raw })
+                } catch (cause) {
+                    throw PayloadLoaderError.from(
+                        PayloadErrors.validationFailed,
+                        [options.collection, id],
+                        cause
+                    )
+                }
 
                 store.set({ id, data })
             }

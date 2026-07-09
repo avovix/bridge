@@ -24,9 +24,13 @@ export class PayloadLoaderError extends AstroError {
     static from<const TArgs extends readonly unknown[]>(
         def: PayloadErrorDefinition<string, string, TArgs>,
         args: TArgs,
-        cause?: Error,
+        cause?: unknown,
     ): PayloadLoaderError {
-        return new PayloadLoaderError(def as PayloadErrorDefinition, args, cause);
+        return new PayloadLoaderError(
+            def as PayloadErrorDefinition, 
+            args, 
+            cause instanceof Error ? cause : undefined,
+        );
     }
 
     static override is(e: unknown): e is PayloadLoaderError {
@@ -59,9 +63,14 @@ export class PayloadLiveError extends LiveCollectionError {
         collection: string,
         def: PayloadErrorDefinition<string, string, TArgs>,
         args: TArgs,
-        cause?: Error,
+        cause?: unknown,
     ): PayloadLiveError {
-        return new PayloadLiveError(collection, def as PayloadErrorDefinition, args, cause);
+        return new PayloadLiveError(
+            collection, 
+            def as PayloadErrorDefinition, 
+            args,
+            cause instanceof Error ? cause : undefined,
+        );
     }
 
     static override is(e: unknown): e is PayloadLiveError {

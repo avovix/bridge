@@ -14,14 +14,13 @@ export const PayloadErrors = {
         `Failed to fetch entry "${id}" from "${collection}".`,
         hint: 'Verify the id exists and the collection is correct.',
     }),
-    // exclude as unused + test coverage gets upset
-    // validationFailed: defineError({
-    //     code: "PAYLOAD_VALIDATION_FAILED",
-    //     name: 'PayloadValidationError',
-    //     message: (collection: string, id: string) =>
-    //     `Entry "${id}" in "${collection}" failed schema validation.`,
-    //     hint: 'Check your collection schema matches the Payload document shape.',
-    // }),
+    validationFailed: defineError({
+        code: "PAYLOAD_VALIDATION_FAILED",
+        name: 'PayloadValidationError',
+        message: (collection: string, id: string) =>
+        `Entry "${id}" in "${collection}" failed schema validation.`,
+        hint: 'Check your collection schema matches the Payload document shape.',
+    }),
     nonUniqueIdField: defineError({
         code: "PAYLOAD_NON_UNIQUE_ID_FIELD",
         name: "PayloadNonUniqueIdFieldError",

@@ -34,15 +34,29 @@ export function payloadLiveCollectionLoader<
     return {
         name: name,
         loadCollection: async ({filter}) => {
-            const collection = await options.adapter.find({
 
-                 // Sensible presets
-                sort: 'createdAt',
-                limit: 1000,
+            let collection
 
-                ...filter,
-                collection: options.collection, 
-            });
+            try {
+                collection = await options.adapter.find({
+
+                    // Sensible presets
+                    sort: 'createdAt',
+                    limit: 1000,
+
+                    ...filter,
+                    collection: options.collection, 
+                });
+            } catch (cause) {
+                return {
+                    error: PayloadLiveError.from(
+                        options.collection,
+                        PayloadErrors.fetchFailed,
+                        [options.collection],
+                        cause
+                    )
+                }
+            }
 
             const idKey = options.idField ?? 'id'
 
@@ -77,7 +91,7 @@ export function payloadLiveCollectionLoader<
                         options.collection,
                         PayloadErrors.entryFetchFailed,
                         [options.collection, filter.id],
-                        cause instanceof Error ? cause : undefined,
+                        cause
                     )
                 }
             }

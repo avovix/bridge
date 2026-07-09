@@ -46,6 +46,14 @@ describe("PayloadLoaderError", () => {
         expect(PayloadLoaderError.is({ source: "payload-loader", live: false, code: "UNKNOWN_CODE" })).toBe(false);
         });
     });
+
+    describe("from", () => {
+        it("sets cause to undefined when a non-Error is passed", () => {
+            const error = PayloadLoaderError.from(PayloadErrors.fetchFailed, ["posts"], "just a string");
+
+            expect(error.cause).toBeUndefined();
+        });
+    })
 });
 
 describe("PayloadLiveError", () => {
@@ -87,4 +95,12 @@ describe("PayloadLiveError", () => {
         expect(PayloadLiveError.is(null)).toBe(false);
         });
     });
+
+    describe("from", () => {
+        it("sets cause to undefined when a non-Error is passed", () => {
+            const error = PayloadLiveError.from("posts", PayloadErrors.entryFetchFailed, ["posts", "1"], "not an error");
+
+            expect(error.cause).toBeUndefined();
+        });
+    })
 });
