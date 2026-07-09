@@ -20,6 +20,7 @@ so if something is missing, unclear, or doesn't fit your use case, please
 - **Uses your own Payload client:** you pass in the SDK client you already configured, so it always matches your Payload version and you keep the full range of client options (auth, base URL, custom fetch, and more) without waiting on this package to expose them. The SDK client is supported now, with Local API and GraphQL planned.
 - **Build-time and live:** covers static content collections and live (on-demand) collections.
 - **Full query passthrough:** anything Payload's find supports (`where`, `sort`, `depth`, `locale`, `draft`, and more) is passed straight through, not limited to a fixed set of options.
+- **Typed errors:** failures come through as typed errors with a stable `code`, a `hint`, and a `static is()` guard, so you can identify and handle them precisely instead of matching on message strings.
 
 A complete, runnable setup lives in the [`astro-payload-with-sdk` example](../../examples/astro-payload-with-sdk).
 
@@ -188,6 +189,62 @@ const { entry } = await getLiveEntry('posts', { id: Astro.params.slug })
 
 Live collections require an adapter configured for on-demand rendering and do not
 use the build-time content store.
+
+## Error handling
+
+Failures produce typed errors so you can identify and handle them precisely. How
+an error is delivered depends on the loader:
+
+- **Build loader** (`load`) **throws** a `PayloadLoaderError`. It surfaces in
+  Astro's error overlay with a message and hint, and fails the build, which is the
+  correct behaviour for build-time content.
+- **Live loader** (`loadCollection` / `loadEntry`) **returns** `{ error }` (a
+  `PayloadLiveError`) instead of throwing, so a request can fail without crashing
+  the page.
+
+A **missing live entry returns `undefined`, not an error** — "not found" is a
+normal result, so `getLiveEntry` returns `undefined` and your page can render a
+404 or fallback. An error is only returned when something is actually wrong (a
+failed fetch, or a non-unique `idField`).
+
+### Error codes
+
+Every error carries a stable `code`. Branch on the `code`, not the message text
+(the code is stable; messages may be reworded).
+
+| Code | Fires when | Loader | Delivered as |
+| --- | --- | --- | --- |
+| `PAYLOAD_FETCH_FAILED` | Fetching a collection fails (network, auth, API down) | build + live (`loadCollection`) | thrown (build) / `{ error }` (live) |
+| `PAYLOAD_ENTRY_FETCH_FAILED` | Fetching a single entry fails | live (`loadEntry`) | `{ error }` |
+| `PAYLOAD_VALIDATION_FAILED` | A document fails Astro schema validation | build | thrown |
+| `PAYLOAD_NON_UNIQUE_ID_FIELD` | A custom `idField` matches more than one document | live (`loadEntry`) | `{ error }` |
+
+For the live loader, `loadEntry` also returns `undefined` (no error) when no
+document matches the requested id.
+
+### Working with errors
+
+Both error types carry a `code`, a `hint`, and (where available) the original
+`cause`, and expose a `static is()` guard for safe narrowing:
+
+```ts
+import { getLiveEntry } from 'astro:content'
+import { PayloadLiveError } from '@avovix/astro-loader-payload'
+import type { PayloadErrorCode } from '@avovix/astro-loader-payload'
+
+const { entry, error } = await getLiveEntry('posts', { id })
+
+if (error && PayloadLiveError.is(error)) {
+  // `error` is now typed as PayloadLiveError
+  if (error.code === ('PAYLOAD_ENTRY_FETCH_FAILED' satisfies PayloadErrorCode)) {
+    // handle a fetch failure
+  }
+}
+```
+
+Prefer `PayloadLiveError.is(error)` / `PayloadLoaderError.is(error)` over
+`instanceof`, and branch on `error.code` rather than the message text (the code
+is stable; messages may be reworded).
 
 ## Using Payload types in your Astro app (monorepo)
 
