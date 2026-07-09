@@ -17,7 +17,7 @@ so if something is missing, unclear, or doesn't fit your use case, please
 ## Why this loader
 
 - **Fully typed:** `collection`, `idField`, and query options are typed against your own Payload `Config`, so you get autocomplete and type-checking for your collections and fields directly in `content.config.ts` and `live.config.ts`.
-- **Uses your own Payload client:** you pass in the SDK client you already configured, so it always matches your Payload version and you keep the full range of client options (auth, base URL, custom fetch, and more) without waiting on this package to expose them. The SDK client is supported now, with Local API and GraphQL planned.
+- **Uses your own Payload client:** you pass in the client you already configured (the SDK for REST, or a Payload instance for the Local API), so it always matches your Payload version and you keep the full range of client options without waiting on this package to expose them. SDK and Local API adapters are supported now, with GraphQL planned.
 - **Build-time and live:** covers static content collections and live (on-demand) collections.
 - **Full query passthrough:** anything Payload's find supports (`where`, `sort`, `depth`, `locale`, `draft`, and more) is passed straight through, not limited to a fixed set of options.
 - **Typed errors:** failures come through as typed errors with a stable `code`, a `hint`, and a `static is()` guard, so you can identify and handle them precisely instead of matching on message strings.
@@ -74,6 +74,59 @@ const posts = await getCollection('posts')
 ```
 
 The loader populates the content store; your pages never touch Payload directly.
+
+## Adapters
+
+The loader talks to Payload through an adapter. You build the client and pass it
+in, so the loader stays decoupled from how you connect.
+
+### SDK adapter (REST)
+
+Best when Astro and Payload are deployed separately. You give it a configured
+`PayloadSDK` client (as shown in the quick start):
+
+```ts
+import { payloadSdkAdapter } from '@avovix/astro-loader-payload'
+import { PayloadSDK } from '@payloadcms/sdk'
+
+const sdk = new PayloadSDK<Config>({ baseURL: import.meta.env.PAYLOAD_BASE_URL })
+
+payloadCollectionLoader({ adapter: payloadSdkAdapter(sdk), collection: 'posts' })
+```
+
+### Local API adapter
+
+Best when Astro and Payload run together (for example, in the same monorepo).
+It uses Payload's Local API in-process, so there is no HTTP server to run. You
+give it a Payload instance:
+
+```ts
+import { getPayload } from 'payload'
+import config from './payload.config'
+import { payloadLocalAdapter } from '@avovix/astro-loader-payload'
+
+const payload = await getPayload({ config })
+
+payloadCollectionLoader({ adapter: payloadLocalAdapter(payload), collection: 'posts' })
+```
+
+### Local for dev, SDK for deploy
+
+Because both adapters satisfy the same interface, you can switch between them
+without changing the rest of your loader setup, for example using the Local API
+locally and the SDK in a decoupled deployment:
+
+```ts
+const adapter = import.meta.env.DEV
+  ? payloadLocalAdapter(await getPayload({ config }))
+  : payloadSdkAdapter(new PayloadSDK<Config>({ baseURL: import.meta.env.PAYLOAD_BASE_URL }))
+
+payloadCollectionLoader({ adapter, collection: 'posts' })
+```
+
+The Local API adapter needs your Payload config and database available at build
+time, which suits co-located setups; the SDK adapter works whenever a running
+Payload API is reachable.
 
 ## Adding a schema
 
@@ -274,7 +327,7 @@ export * from './payload-types'
 - **Entry limit:** the loader fetches up to 1000 entries per collection by default. Pass `query.limit` to change it. Full pagination traversal is planned.
 - **HMR in dev:** due to [an Astro limitation](https://github.com/withastro/astro/issues/13253), define your collections directly in `content.config.ts` rather than in a separate imported file, or HMR may not pick up changes.
 - **Empty on first run:** if a collection appears empty when you first start the dev server, trigger a content sync with `s` + Enter, or restart the server.
-- **SDK adapter only for now:** Local API and GraphQL adapters are planned.
+- **GraphQL adapter planned:** SDK (REST) and Local API adapters are supported; a GraphQL adapter is planned.
 
 ## License
 
