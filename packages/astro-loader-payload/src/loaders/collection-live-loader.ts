@@ -22,7 +22,12 @@ export function payloadLiveCollectionLoader<
     TSlug extends CollectionSlug<T>
 >(
     options: payloadLiveOptions<T, TSlug>
-): LiveLoader<Record<string, unknown>, EntryFilter, PayloadFindQuery<T>>  {
+): LiveLoader<
+    Record<string, unknown>, 
+    EntryFilter, 
+    PayloadFindQuery<T>, 
+    PayloadLiveError
+    >  {
 
     const name = resolveLoaderName(options.collection, options.loaderName);
 
@@ -94,5 +99,5 @@ export function payloadLiveCollectionLoader<
             return { id: String(raw[idKey]), data: raw}
         },
 
-    } satisfies LiveLoader<Record<string, unknown>, EntryFilter, PayloadFindQuery<T>>
+    } satisfies LiveLoader<Record<string, unknown>, EntryFilter, PayloadFindQuery<T>, PayloadLiveError>
 }

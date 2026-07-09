@@ -5,14 +5,6 @@ import { PayloadErrors } from "../data/errors-data";
 
 const payloadErrorCodes = new Set(Object.values(PayloadErrors).map((d) => d.code));
 
-export function defineError<
-  const TCode extends string,
-  const TName extends string,
-  const TArgs extends readonly unknown[],
->(def: PayloadErrorDefinition<TCode, TName, TArgs>): PayloadErrorDefinition<TCode, TName, TArgs> {
-  return def;
-}
-
 export class PayloadLoaderError extends AstroError {
     readonly code: string
     readonly source = "payload-loader"

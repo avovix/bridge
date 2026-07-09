@@ -1,4 +1,4 @@
-import { defineError } from "../internal/error-utils";
+import { defineError } from "../internal/error-define";
 
 export const PayloadErrors = {
     fetchFailed: defineError({
